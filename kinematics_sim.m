@@ -60,7 +60,7 @@ robot = SerialLink(L, 'name', 'PRR Robot');
 
 
 % Initial joint positions
-q = [0, 0, 0, 0]; % [d1, theta2, theta3, dummy for EE]
+q = [0, pi/2, -pi/2, 0]; % [d1, theta2, theta3, dummy for EE]
 
 % Visualize the robot with the end effector
 robot.plot(q, 'workspace', [-1 1 -1 1 -0.5 1.5]);
