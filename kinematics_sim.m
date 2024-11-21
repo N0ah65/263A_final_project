@@ -40,12 +40,32 @@ disp(T03);
 
 %% Create the manipulator
 
-n = 3; %degrees of freedom
+% Define robot links using DH parameters
+% PRR robot: Prismatic - Revolute - Revolute
 
-L(1) = Link([0 a1 d1 pi/2]); % Link 1
-L(2) = Link([pi/2 a2 d2 0]); % Link 2
-L(3) = Link([0 a3 d3 0]); % Link 3
-robot = SerialLink(L, 'name', 'RRR Robot');
+L(1) = Link([0 0 0 pi/2, 1]); % Prismatic joint (variable d1)
+L(1).qlim = [0, 1];           % Prismatic joint limits [min, max]
 
-q = [0,0,0];
+L(2) = Link([0 0 0 pi/2]);    % Revolute joint (rotates vertically, about Y-axis)
+L(2).qlim = [-pi, pi];        % Revolute joint limits
+
+L(3) = Link([0 0.5 0 pi/2]);  % Revolute joint (rotates vertically, about Y-axis)
+L(3).qlim = [-pi/2, pi/2];    % Revolute joint limits
+
+L(4) = Link([0 0.2 0 0, 0]); % Fixed offset of 0.2m from last revolute joint
+L(4).qlim = [0, 0]; 
+% Create the SerialLink robot
+robot = SerialLink(L, 'name', 'PRR Robot');
+
+
+
+% Initial joint positions
+q = [0, 0, 0, 0]; % [d1, theta2, theta3, dummy for EE]
+
+% Visualize the robot with the end effector
+robot.plot(q, 'workspace', [-1 1 -1 1 -0.5 1.5]);
+title('PRR Robot with End Effector');
+
+% Interactive teaching mode
 robot.teach(q);
+
