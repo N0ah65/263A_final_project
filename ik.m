@@ -1,7 +1,8 @@
 % Define target position for the end effector
-x_target = 0.4;
-y_target = 0.2;
-z_target = 0.6;
+targets = [  0.05,  0.05, 0.0;  % Target 1
+            -0.05,  0.05, 0.0;  % Target 2
+             0.1,  -0.05, 0.0;  % Target 3
+            -0.1,  -0.05, 0.0]; % Target 4
 
 % Define link length of the robot
 link_length = 0.5; % Length of each link in meters
@@ -28,5 +29,25 @@ L(4) = Link([0 0.2 0 0, 0]); % Fixed offset of 0.2m from last revolute joint
 L(4).qlim = [0, 0]; 
 
 robot = SerialLink(L, 'name', 'PRR Robot');
-robot.plot(q_ik, 'workspace', [-1 1 -1 1 -0.5 1.5]);
-title('PRR Robot Inverse Kinematics Solution');
+
+% Loop through each target position
+for i = 1:size(targets, 1)
+    % Extract target position
+    x_target = targets(i, 1);
+    y_target = targets(i, 2);
+    z_target = targets(i, 3);
+
+    % Compute inverse kinematics
+    q_ik = inverse_kinematics_prr(x_target, y_target, z_target, link_length);
+
+    % Display the result
+    fprintf('Target %d: [x, y, z] = [%.2f, %.2f, %.2f]\n', i, x_target, y_target, z_target);
+    fprintf('Calculated joint variables [d1, theta2, theta3]: [%.2f, %.2f, %.2f]\n', q_ik);
+
+    % Visualize the robot at the calculated joint configuration
+    robot.plot([q_ik, 0], 'workspace', [-1 1 -1 1 -0.5 1.5]);
+    title(sprintf('PRR Robot Configuration for Target %d', i));
+
+    % Pause between visualizations for clarity
+    pause(2);
+end
