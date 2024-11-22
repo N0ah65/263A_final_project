@@ -30,6 +30,7 @@ L(4).qlim = [0, 0];
 
 robot = SerialLink(L, 'name', 'PRR Robot');
 
+
 % Loop through each target position
 for i = 1:size(targets, 1)
     % Extract target position
@@ -38,16 +39,23 @@ for i = 1:size(targets, 1)
     z_target = targets(i, 3);
 
     % Compute inverse kinematics
-    q_ik = inverse_kinematics_prr(x_target, y_target, z_target, link_length);
+    q_prev = [0 0 0 0];
+    q_target = [inverse_kinematics_prr(x_target, y_target, z_target, link_length),0];
 
     % Display the result
     fprintf('Target %d: [x, y, z] = [%.2f, %.2f, %.2f]\n', i, x_target, y_target, z_target);
-    fprintf('Calculated joint variables [d1, theta2, theta3]: [%.2f, %.2f, %.2f]\n', q_ik);
+    fprintf('Calculated joint variables [d1, theta2, theta3]: [%.2f, %.2f, %.2f]\n', q_target);
 
-    % Visualize the robot at the calculated joint configuration
-    robot.plot([q_ik, 0], 'workspace', [-1 1 -1 1 -0.5 1.5]);
-    title(sprintf('PRR Robot Configuration for Target %d', i));
+    % Generate smooth trajectory between q_prev and q_target
+    num_steps = 50; % Number of steps in the trajectory
+    traj = jtraj(q_prev, q_target, num_steps); % Generates trajectory
 
-    % Pause between visualizations for clarity
-    pause(2);
+    % Visualize the robot moving along the trajectory
+    for j = 1:num_steps
+        robot.plot([traj(j, :)], 'workspace', [-1 1 -1 1 -0.5 1.5]);
+        pause(0.05); % Adjust pause for desired speed
+    end
+
+    % Update q_prev for the next iteration
+    q_prev = q_target;
 end
