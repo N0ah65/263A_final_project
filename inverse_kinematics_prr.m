@@ -13,9 +13,13 @@ function q = inverse_kinematics_prr(x, y, z, link_length)
     % Clamp values for acos to avoid complex numbers
     cos_value = max(-1, min(1, link_length / r));
 
-    % Compute theta2 and theta3 (revolute joint variables)
-    theta2 = atan2(y, x) - acos(cos_value);
-    theta3 = 2 * acos(cos_value) - theta2;
+    % Compute intermediate angles
+    phi = atan2(y, x);               % Angle of the target position in the XY plane
+    delta = acos(cos_value);         % Angle subtended by the link at the target
+
+    % Compute theta2 and theta3
+    theta2 = phi - delta;            % First joint angle (relative to horizontal)
+    theta3 = 2 * delta;              % Second joint angle (closing the triangle)
 
     % Return the joint variables
     q = [d1, theta2, theta3];

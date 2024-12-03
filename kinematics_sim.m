@@ -39,6 +39,8 @@ disp('Transformation matrix from base to end-effector (T03):');
 disp(T03);
 
 %% Create the manipulator
+clc;
+clear all;
 % Define robot links using DH parameters
 % PRR robot: Prismatic - Revolute - Revolute
 
@@ -48,7 +50,7 @@ L(1).qlim = [0, 20];           % Prismatic joint limits [min, max]
 L(2) = Link([0 0 8 0]);    % Revolute joint (rotates vertically, about Y-axis)
 L(2).qlim = [-pi, pi];        % Revolute joint limits
 
-L(3) = Link([0 0 8 0]);  % Revolute joint (rotates vertically, about Y-axis)
+L(3) = Link([0 0 9.1 0]);  % Revolute joint (rotates vertically, about Y-axis)
 L(3).qlim = [-pi, pi];    % Revolute joint limits
 
 L(4) = Link([0 0 0 pi, 0]); % Fixed offset of 0.2m from last revolute joint
@@ -58,8 +60,8 @@ robot = SerialLink(L, 'name', 'PRR Robot');
 
 
 
-% Initial joint positions
-q = [0, 0, 0, 0]; % [d1, theta2, theta3, dummy for EE]
+% Initial joint positions (match number of active DOFs)
+q = [5, 0, 0.5033, 0]; % [d1, theta2, theta3]
 
 % Visualize the robot with the end effector
 robot.plot(q, 'workspace', [-30 30 -30 30 -1 30]);
